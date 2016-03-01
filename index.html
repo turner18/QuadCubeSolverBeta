@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Quadratic and Cubic Formula Grapher</title>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<style type="text/css">
+		html, body {
+			margin: 0px;
+		}
+		canvas {
+			display: block;
+		}
+
+		/*David's cool css file for the soft dev class 2016 winter*/
+
+		#wrapper {
+			width: 85%;
+			height: 93%;
+			margin: auto;
+		}
+
+		header {
+			width: 60%;
+			height: 7%;
+			top: 30px;
+			box-shadow: 10px 10px 10px black;
+			margin-top: 20px;
+			margin-left: auto;
+			margin-right: auto;
+			background-color: orange;
+			font-size: 44px;
+			text-align: center;
+			color: white;
+		}
+
+		body {
+			background-color: rgb(150,150,150);
+		}
+
+		#graphCanvas {
+			margin-left: 30%;
+			border-style: solid;
+			border-width: 20px;
+			border-radius: 30px;
+			background-color: rgb(200,230,255);
+		}
+
+		#coeff {
+			font-size: 20px;
+			margin-top: 2%;
+			float: left;
+			margin-left: 5%;
+			width: 15%;
+			position: absolute;
+			background-color: #8CC8F0;
+			padding: 10px;
+			border-radius: 20px;
+		}
+
+		#plotButtons {
+			font-size: 20px;
+			margin-top: 15%;
+			float: left;
+			margin-left: 5%;
+			width: 15%;
+			position: absolute;
+			padding: 10px;
+		}
+
+		#answers {
+			margin-left: 5%;
+			margin-top: 26%;
+			float: left;
+			width: 15%;
+			font-size: 20px;
+			background-color: rgb(50,50,50);
+			position: absolute;
+			padding: 10px;
+			border-radius: 20px;
+			visibility: visible;
+		}
+
+		#cubeanswers {
+			visibility: hidden;
+		}
+
+		#plotYint {
+			visibility: visible;
+		}
+
+		#cubeYint {
+			visibility: hidden;
+		}
+
+		#discrim {
+			color: #FFFFFF;
+			visibility: visible;
+		}
+
+		#vertex {
+			color: #7AF8DF;
+			visibility: visible;
+		}
+
+		#aos {
+			color: #FFA522;
+			visibility: visible;
+		}
+
+		#yint {
+			color: #EE77EE;
+		}
+
+		#solutions {
+			color: #AAAAFF;
+			visibility: visible;
+		}
+
+		#submitValButton {
+
+		}
+
+		#zoomInButton {
+			font-size: 20px;
+			width: 40px;
+			height: 40px;
+			visibility: visible;
+		}
+
+		#zoomOutButton {
+			font-size: 20px;
+			width: 40px;
+			height: 40px;
+			visibility: visible;
+		}
+
+		#newGraphButton {
+			font-size: 18px;
+			width: 100px;
+		}
+
+		.myCenter {
+			position = relative;
+			margin-left: auto;
+			margin-right: auto;
+		}
+	</style>
+</head>
+<body onload = "init()">
+	<div id="wrapper">
+		<header>Info for the quadratic/cubic formula</header><br>
+		<div id="coeff">
+			<p class="formInfo">Coefficients go here<br>
+			a = <input size="10" type="text" id="cubeA" value="0"> <br>
+			b = <input size="10" type="text" id="quadB" value="1"> <br>
+			c = <input size="10" type="text" id="linC" value="0"> <br>
+			d = <input size="10" type="text" id="constant" value="0"> <br><br>
+			<button id = "submitValButton" onclick="QF()">Submit Values</button><br><br>
+		<!-- </div>
+		<div id = "plotButtons"> -->
+			<button id = "plotYint" onclick="plotYint()">Show y-intercepts</button>
+			<button id = "plotXint" onclick="plotXint()">Show x-intercepts</button>
+			<button id = "plotVertex" onclick="plotVertex()">Show vertex</button>
+			<button id = "plotAOS" onclick="plotAOS()">Show axis of symmetry</button><br><br></p>
+			<div class = "myCenter">
+				<button id = "zoomOutButton" onclick="zoomOut()">-</button>
+				<button id = "zoomInButton" onclick="zoomIn()">+</button><br><br>
+				<button id = "newGraphButton" onclick="newGraph()">New graph</button>
+			</div>
+		</div>
+		<div id = "answers">
+			<div id = "yint">Y-intercept</div>
+			<div id = "discrim">Discriminant</div>
+			<div id = "vertex">Vertex</div>
+			<div id = "aos">Axis of symmetry</div>
+			<div id = "solutions">Solutions</div>
+		</div>
+		<canvas id="graphCanvas"></canvas>
+	</div> <!-- close wrapper -->
+<script type = "text/javascript">
+	//Javascript for graphing and calculating cubic functions
+var a,b,c,d,root1,root2,aos,vertY,context,w,h,curZoom = 3,k = 10;
+
+function QF() {
+	// getting values to do cubic formula
+	a = $("#cubeA").val();
+	b = $("#quadB").val();
+	c = $("#linC").val();
+	d = $("#constant").val();
+	aos = -(c*1)/(2*b);
+	vertY = (aos*aos*b)+(c*aos)+d;
+	results();
+	graphCube();
+}
+
+function init() {
+	canvas = document.getElementById('graphCanvas');
+	context = canvas.getContext("2d");
+	w = canvas.width = 800;
+	h = canvas.height = 600;
+	$("#answers").hide();
+	grid();
+}
+
+function plotVertex() {
+	context.beginPath();
+	context.strokeStyle = '#7AF8DF';
+	context.fillStyle = '#7AF8DF';
+
+	context.moveTo(w/2+(w/k)*aos+5,h/2-(h/k)*vertY);
+	context.arc(w/2+(w/k)*aos,h/2-(h/k)*vertY,5,0,2*Math.PI);
+	context.fill();
+}
+
+function plotAOS() {
+	context.setLineDash([5,5]);
+	context.beginPath();
+	context.strokeStyle = '#FFA522';
+	context.fillStyle = '#FFA522';
+
+	context.moveTo(w/2+(w/k)*aos,0);
+	context.lineTo(w/2+(w/k)*aos,h);
+	context.stroke();
+}
+
+function plotXint() {
+	context.beginPath();
+	context.strokeStyle = '#AAAAFF';
+	context.fillStyle = '#AAAAFF';
+
+	if (imaginarySol == false) {
+		context.moveTo(w/2+(w/k)*root1+5,h/2);
+		context.arc(w/2+(w/k)*root1,h/2,5,0,2*Math.PI);
+		context.fill();
+
+		context.moveTo(w/2+(w/k)*root2+5,h/2);
+		context.arc(w/2+(w/k)*root2,h/2,5,0,2*Math.PI);
+		context.fill();
+	}
+}
+
+//plotting a circle on the y intercept
+function plotYint() {
+	context.beginPath();
+	context.strokeStyle = '#EE77EE';
+	context.fillStyle = '#EE77EE';
+	context.moveTo(w/2+5,h/2-(h/k)*d);
+	context.arc(w/2,h/2-(h/k)*d,5,0,2*Math.PI);
+	context.fill();
+}
+
+function graphCube () {
+	context.setLineDash([1,0]);
+	for (var i = 0; i < w; i++) {
+		x = (w/2-i)/k;
+		y = d*1+c*x+b*Math.pow(x,2)+a*Math.pow(x,3);
+		nx =(w/2-(i+1))/k;
+		ny = d*1+c*nx+b*Math.pow(nx,2)+a*Math.pow(nx,3);
+
+		context.beginPath();
+		context.lineWidth = 2;
+		context.strokeStyle = "Red";
+		context.moveTo(w/2+x*w/k, h/2-y*h/k);
+		context.lineTo(w/2+nx*w/k, h/2-ny*h/k);
+		context.stroke();
+	}
+}
+
+function grid() {
+	//using the direct variation constant k, we make a grid.
+	context.lineWidth=1;
+	context.strokeStyle="rgba(0,0,0,.4)";
+	for (var i = 1; i < k; i++) {
+		context.beginPath();
+		context.moveTo(w/k*i,0);
+		context.lineTo(w/k*i,h);
+		context.stroke();
+	}
+	for (var i = 1; i < k; i++) {
+		context.beginPath();
+		context.moveTo(0,h/k*i);
+		context.lineTo(w,h/k*i);
+		context.stroke();
+	}
+
+	// x and y axis
+	context.lineWidth=3;
+	context.strokeStyle="rgba(0,0,0,.9)";
+	context.beginPath();
+	//x axis
+	context.moveTo(0,h/2);
+	context.lineTo(w,h/2);
+	context.stroke();
+	//y axis
+	context.moveTo(w/2,0);
+	context.lineTo(w/2,h);
+	context.stroke();
+}
+
+function smallGrid() {
+	// console.log("CHECK");
+	k = 8;
+	init();
+}
+
+function mediumGrid() {
+	// console.log("CHECK");
+	k = 16;
+	init();
+}
+
+function largeGrid() {
+	// console.log("CHECK");
+	k = 40;
+	init();
+}
+
+function hugeGrid() {
+	// console.log("CHECK");
+	k = 80;
+	init();
+}
+
+function zoomOut() {
+	curZoom++;
+	changeZoom();
+}
+
+function zoomIn() {
+	curZoom--;
+	changeZoom();
+}
+
+function changeZoom() {
+	if (curZoom < 1) {
+		curZoom = 1;
+	}
+	if (curZoom == 1) {
+		document.getElementById('zoomInButton').style.visibility = 'hidden';
+		k = 4;
+	}
+	if (curZoom == 2) {
+		document.getElementById('zoomInButton').style.visibility = 'visible';
+		k = 8;
+	}
+	if (curZoom == 3) {
+		k = 16;
+	}
+	if (curZoom == 4) {
+		document.getElementById('zoomOutButton').style.visibility = 'visible';
+		k = 40;
+	}
+	if (curZoom > 5) {
+		curZoom = 5;
+	}
+	if (curZoom == 5) {
+		document.getElementById('zoomOutButton').style.visibility = 'hidden';
+		k = 80;
+	}
+	init();
+}
+
+function newGraph() {
+	context.clearRect(0,0,w,h);
+	init();
+	$("#answers").hide();
+}
+
+function results () {
+	if (a != 0) {
+		document.getElementById('plotXint').style.visibility = 'hidden';
+		document.getElementById('plotVertex').style.visibility = 'hidden';
+		document.getElementById('plotAOS').style.visibility = 'hidden';
+	}
+	else {
+		document.getElementById('plotXint').style.visibility = 'visible';
+		document.getElementById('plotVertex').style.visibility = 'visible';
+		document.getElementById('plotAOS').style.visibility = 'visible';
+	}
+
+	imaginarySol = false;
+	// finding vertext and displaying symline and yint results
+	if (a == 0) {
+		vX = -(c*1)/(2*b);
+		vY = b*Math.pow(vX,2)+c*vX+d*1;
+		dis = Math.pow(c,2)-4*b*d;
+
+		if (dis < 0) {
+			imaginarySol = true;
+			dis*= -1;
+		}
+
+		root1 = Math.round((vX + (Math.sqrt(dis)/(2*b)))*100)/100;
+		root2 = Math.round((vX - (Math.sqrt(dis)/(2*b)))*100)/100;
+		vX = Math.round(vX*100)/100;
+		vY = Math.round(vY*100)/100;
+		document.getElementById('discrim').style.visibility = 'visible';
+		document.getElementById('vertex').style.visibility = 'visible';
+		document.getElementById('aos').style.visibility = 'visible';
+		document.getElementById('solutions').style.visibility = 'visible';
+		$("#answers").fadeIn(1500);
+		$("#yint").text("Y-intercept is y = "+ d);
+		$("#vertex").text("Vertex is at ("+vX+","+vY+")");
+		$("#discrim").text("Discriminant is "+ dis);
+		$("#aos").text("Axis of symmetry is x = "+ vX);
+		
+
+		if (dis == 0) {
+			$("#solutions").text("Real solution is x = " + root1);
+		}
+		else {
+			$("#solutions").text("Real solutions are x = " + root1 + " and x = " + root2);
+		}
+
+		if (imaginarySol == true) {
+			$("#solutions").text("Imaginary solutions are x = " + root1 + " and x = " + root2);
+		}
+		else {
+			$("#solutions").text("Real solutions are x = " + root1 + " and x = " + root2);
+		}
+	}
+	else {
+		$("#answers").fadeIn(1500);
+		$("#yint").text("Y-intercept is y = "+ d);
+		document.getElementById('discrim').style.visibility = 'hidden';
+		document.getElementById('vertex').style.visibility = 'hidden';
+		document.getElementById('aos').style.visibility = 'hidden';
+		document.getElementById('solutions').style.visibility = 'hidden';
+	}
+}
+
+function funDrawing() {
+	context = document.getElementById('graphCanvas');
+	context = context.getContext("2d");
+	context.lineWidth = 10;
+	context.beginPath();
+
+	//The letter X
+	context.moveTo(40,35);
+	context.lineTo(110,105);
+	context.stroke();
+	context.moveTo(40,105);
+	context.lineTo(110,35);
+	context.stroke();
+
+	//The letter D
+	context.moveTo(130,30);
+	context.lineTo(130,110);
+	context.stroke();
+	context.moveTo(132,35);
+	context.lineTo(146,35);
+	context.stroke();
+	context.moveTo(132,105);
+	context.lineTo(146,105);
+	context.stroke();
+	context.moveTo(140,35);
+	context.arc(140,70,35,-(1/2)*Math.PI,(1/2)*Math.PI);
+	context.stroke();
+
+	//The letter Q
+	context.moveTo(265,70);
+	context.arc(230,70,35,0,2*Math.PI);
+	context.stroke();
+	context.moveTo(230,75);
+	context.lineTo(265,110);
+	context.stroke();
+
+	//The letter G from the original Google logo
+	context.moveTo(70,50);
+	context.arc(50,50,20,0,2*Math.PI);
+	context.stroke();
+	context.moveTo(50,70);
+	context.arc(50,80,10,Math.PI/4,4*Math.PI/3);
+	context.stroke();
+}
+</script>
+</body>
+</html>
